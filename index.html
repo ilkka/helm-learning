@@ -35,6 +35,20 @@
 <a name="hi-there" class="anchor" href="#hi-there"><span class="octicon octicon-link"></span></a>Hi there</h3>
 
 <p>This project is just a private vehicle for learning about <a href="http://helm-engine.org">Helm</a>.</p>
+
+        <h3><a name="installing-helm" class="anchor" href="#installing-helm"><span class="octicon octicon-link"></span></a>Instaling Helm on OS X</h3>
+
+        <p>Installing Helm (0.6.1 at the time of writing) on Mac OS X turned out to be a bit of a chore. I don't have Haskell-platform, I have [Haskell for Mac OS X](http://ghcformacosx.github.io). Here's what I did to get Helm installed:</p>
+
+        <pre><code>$ cabal sandbox init
+$ brew install sdl2
+$ brew install cairo --without-x
+$ brew install pango --without-x
+$ cabal install gtk2hs-buildtools
+$ env PATH=$(pwd)/.cabal/bin:$PATH PKG_CONFIG_PATH=/opt/X11/lib/pkgconfig cabal install "helm>=0.6.1" --with-gcc=gcc-4.9
+        </code></pre>
+
+        <p>The <code>PATH</code> setting is required so that the gtk2hs-buildtools binaries are found, and <code>PKG_CONFIG_PATH</code> so that the pkg-config files for the homebrew-installed libraries are found. Finally, it's necessary to give the <code>--with-gcc</code> flag or glib compilation fails.</p>
       </section>
     </div>
 
