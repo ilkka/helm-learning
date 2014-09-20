@@ -11,13 +11,16 @@ data Impulse = Impulse { dx :: Int, dy :: Int, dt :: Time.Time } deriving (Show)
 
 {-| Given an impulse and a state, returns a new state with updated velocities and positions |-}
 update :: Impulse -> State -> State
-update (Impulse { dx = dx, dy = dy, dt = dt}) state =
-  state { xvel = realToFrac dx + xvel state, yvel = realToFrac dy + yvel state,
-          xpos = xpos state + dt * xvel state, ypos = ypos state + dt * yvel state }
+update (Impulse { dx = dx, dy = dy, dt = dt}) state = trace (show newstate) newstate
+  where
+    newstate = state { xvel = realToFrac dx / 100.0 + xvel state,
+                       yvel = realToFrac dy / 100.0 + yvel state,
+                       xpos = xpos state + dt * xvel state,
+                       ypos = ypos state + dt * yvel state }
 
 {-| Combine arrow inputs and time delta to an impulse |-}
 impulse :: (Int, Int) -> Time.Time -> Impulse
-impulse (dx, dy) dt = trace ("impulse " ++ show i) i
+impulse (dx, dy) dt = trace (show i) i
   where
     i = Impulse { dx = dx, dy = dy, dt = dt }
 
