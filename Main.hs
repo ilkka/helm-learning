@@ -1,16 +1,27 @@
 import FRP.Helm
 import qualified FRP.Helm.Keyboard as Keyboard
 import qualified FRP.Helm.Window as Window
+import qualified FRP.Helm.Time as Time
 
-data State = State { mx :: Double, my :: Double }
+data State = State { mx :: Double, my :: Double,
+                     vx :: Double, vy :: Double }
 
-step :: (Int, Int) -> State -> State
-step (dx, dy) state = state { mx = realToFrac dx + mx state,
-                              my = realToFrac dy + my state }
+{-| Given (dx, dy) and a state, returns a new state with updated velocities |-}
+accel :: (Int, Int) -> State -> State
+accel (dx, dy) state = state { mx = mx state, my = my state,
+                               vx = realToFrac dx + vx state,
+                               vy = realToFrac dy + vy state }
 
+{-| Given a Time value, returns a new state with updated position |-}
+tick :: Time.Time -> State -> State
+tick dt state = state { mx = mx state + dt * vx state,
+                        my = my state + dt * vy state,
+                        vx = vx state, vy = vy state }
+
+{-| Given a viewport size, returns rendering functions (State -> Element) |-}
 render :: (Int, Int) -> State -> Element
-render (w, h) (State { mx = mx, my = my }) =
-  centeredCollage w h [move (mx, my) $ filled red $ square 100]
+render (w, h) (State { vx = vx, vy = vy }) =
+  centeredCollage w h [move (vx, vy) $ filled red $ square 100]
 
 main :: IO ()
 main =
@@ -23,5 +34,5 @@ main =
     -- stepper signal generator
     run engine $ render <~ Window.dimensions engine ~~ stepper
   where
-    state = State { mx = 0, my = 0 }
-    stepper = foldp step state Keyboard.arrows
+    state = State { vx = 0, vy = 0 }
+    stepper = foldp accel state Keyboard.arrows
